@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react"
 import {useDispatch} from "react-redux";
 import data, { answers } from "../database/data";
+import { getServerData } from "../helper/helper";
 
 // redux action
 
@@ -20,13 +21,14 @@ export const useFetchQuestion = () => {
         (async () => {
             try {
                 let question = await data;
-
-                if(question.length > 0){
+                const [{ questions, answers}] = await getServerData(`${process.env.REACT_APP_SERVER_HOSTNAME}/api/questions`, (data) => data)
+                console.log({ questions, answers})
+                if(questions.length > 0){
                     setGetData(prev => ({...prev, isLoading: false}));
                     setGetData(prev => ({...prev, apiData: {question, answers}}));
 
                     //dispatch
-                    dispatch(Action.startExamAction({question, answers}))
+                    dispatch(Action.startExamAction({question : questions, answers}))
                 }else {
                     throw new Error("No pregunta disponible");
                 }
